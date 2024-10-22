@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview and Sign Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light background for better contrast */
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h3 {
+            color: #555;
+        }
+
+        /* Container for the PDF preview and signature pad */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align the elements */
+            max-width: 800px;
+            margin: 0 auto; /* Center the container */
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff; /* White background for the content area */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        /* Style for the PDF embed */
+        embed {
+            border: 1px solid #ccc; /* Light border around PDF */
+            border-radius: 8px; /* Rounded corners */
+            margin-bottom: 20px; /* Space below the PDF */
+        }
+
+        /* Signature pad styles */
+        #signature-pad {
+            border: 2px dashed #007bff; /* Dashed border for signature pad */
+            width: 100%; /* Full width */
+            max-width: 400px; /* Max width for signature pad */
+            height: 150px; /* Fixed height */
+            cursor: crosshair; /* Crosshair cursor for drawing */
+            background: transparent; /* Ensure canvas background is transparent */
+            border-radius: 4px; /* Rounded corners */
+        }
+
+        /* Button styles */
+        button {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            border-radius: 4px; /* Rounded corners */
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer; /* Pointer cursor on hover */
+            margin: 5px; /* Space between buttons */
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Hidden form for signature data */
+        form {
+            display: none; /* Keep this hidden until needed */
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px; /* Reduce padding on smaller screens */
+            }
+
+            button {
+                width: 100%; /* Full width buttons on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Preview and Sign Document: {{ filename }}</h1>
+
+        <!-- PDF Preview -->
+        <embed src="{{ url_for('download_file', filename=filename) }}" width="600" height="800" type="application/pdf">
+
+        <!-- Signature Pad -->
+        <h3>Sign Here:</h3>
+        <canvas id="signature-pad"></canvas>
+        <br>
+        <button onclick="clearPad()">Clear</button>
+        <button onclick="submitSignature()">Sign Document</button>
+
+        <form id="signature-form" action="{{ url_for('sign_document_and_save', filename=filename) }}" method="POST">
+            <input type="hidden" name="signature" id="signature">
+        </form>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        // Set the canvas size
+        canvas.width = 400; // Set to desired width
+        canvas.height = 150; // Set to desired height
+
+        // Event listeners for drawing
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseleave', stopDrawing); // Stop drawing when mouse leaves canvas
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e); // Draw on mouse down
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath(); // Reset the path
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'black'; // Color of the signature
+
+            ctx.lineTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+        }
+
+        function clearPad() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function submitSignature() {
+            const dataURL = canvas.toDataURL('image/png', 1.0); // Get data URL with transparency
+            document.getElementById('signature').value = dataURL; // Set the hidden input's value to the data URL
+            document.getElementById('signature-form').submit(); // Submit the form
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light background for better contrast */
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333; /* Darker color for the heading */
+            text-align: center; /* Center align the heading */
+        }
+
+        /* Container for the upload form */
+        .upload-container {
+            max-width: 500px; /* Max width of the container */
+            margin: 0 auto; /* Center the container */
+            padding: 20px; /* Padding around the content */
+            background-color: #fff; /* White background for the form */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        /* Style for the file input */
+        input[type="file"] {
+            width: 100%; /* Full width */
+            padding: 10px; /* Padding for better touch */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 4px; /* Rounded corners */
+            margin-bottom: 15px; /* Space below the input */
+        }
+
+        /* Button styles */
+        button {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            border-radius: 4px; /* Rounded corners */
+            padding: 10px 15px; /* Padding for the button */
+            font-size: 16px; /* Font size */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s; /* Smooth transition */
+            width: 100%; /* Full width button */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .upload-container {
+                padding: 10px; /* Reduce padding on smaller screens */
+            }
+
+            button {
+                font-size: 14px; /* Smaller font size for buttons on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1>Upload Document for Signing</h1>
+        <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+</html>
